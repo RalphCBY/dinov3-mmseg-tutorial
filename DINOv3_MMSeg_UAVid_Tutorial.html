@@ -294,10 +294,10 @@ footer.foot {
         <div class="toc">
 <ul>
 <li><a href="#1">1. 一句话概括</a></li>
-<li><a href="#2">2. 这个包解决什么问题</a></li>
-<li><a href="#3">3. 当前包的目录结构</a></li>
-<li><a href="#4">4. 不包含什么</a></li>
-<li><a href="#5-dinov3">5. DINOv3 在这里是什么</a></li>
+<li><a href="#2">2. 这套教程涵盖什么</a></li>
+<li><a href="#3">3. 教程包的目录结构</a></li>
+<li><a href="#4">4. 你需要自行准备的东西</a></li>
+<li><a href="#5-dinov3">5. DINOv3 的作用</a></li>
 <li><a href="#6">6. 什么是语义分割</a></li>
 <li><a href="#7-uavid">7. UAVid 类别和颜色</a></li>
 <li><a href="#8">8. 数据集文件夹格式</a></li>
@@ -356,6 +356,7 @@ footer.foot {
 </li>
 <li><a href="#209">20.9 最推荐的改造路线</a></li>
 <li><a href="#2010">20.10 修改后的验证顺序</a></li>
+<li><a href="#2011">20.11 给学生发包时的最小复现流程</a></li>
 </ul>
 </li>
 <li><a href="#21">21. 评估指标解释</a><ul>
@@ -380,12 +381,36 @@ footer.foot {
 <li><a href="#2510-checkpoint">25.10 没有 checkpoint</a></li>
 </ul>
 </li>
-<li><a href="#26">26. 给学生的最小检查清单</a></li>
+<li><a href="#26">26. 启动前最小检查清单</a></li>
 </ul>
 </div>
 
     </nav>
     <main class="content">
+<p>本文档是 <code>mmseg+dinov3</code> 教程包的详细说明。</p>
+<p>本教程适合以下读者:</p>
+<ul>
+<li>没有系统接触过 AI 或深度学习的遥感、测绘、地理信息、无人机影像方向学生。</li>
+<li>已经有自己的影像和逐像素标签，希望使用现成代码训练语义分割模型的人。</li>
+<li>需要理解 DINOv3、MMSegmentation、UAVid 数据格式、训练、测试、可视化和评估指标的人。</li>
+</ul>
+<p>学完本教程, 你将能够:</p>
+<ul>
+<li>知道语义分割任务到底在做什么。</li>
+<li>知道 DINOv3 在这里扮演什么角色。</li>
+<li>能把自己的影像和标签整理成可运行的数据格式。</li>
+<li>能在一个已有 MMSegmentation 环境里跑通训练、测试和单图推理。</li>
+<li>能读懂 <code>mIoU</code>、<code>mAcc</code>、<code>aAcc</code>、per-class IoU 等评估结果。</li>
+</ul>
+<p><code>mmsegmentation-main/mmseg/</code> 已包含从服务器工作项目复制来的完整 MMSeg Python 源码目录，你安装好兼容的 OpenMMLab/MMSeg 环境后，可以直接进入本包的 <code>mmsegmentation-main/</code> 运行教程命令。大体积 DINOv3 权重、完整 UAVid 数据、SLURM 日志和训练输出不包含在包内，需要按教程单独指定路径。</p>
+<p>本教程的资源构成如下:</p>
+<div class="codehilite"><pre><span></span><code>环境依赖由 conda/pip 安装
+MMSeg Python 源码由本包自带
+教程代码、config、sample data 也由本包自带
+大权重和正式数据集由使用者自己提供路径
+</code></pre></div>
+
+<p>不需要再单独下载 MMSegmentation 源码包。只要环境中有兼容的 PyTorch、MMCV、MMEngine、OpenMIM/MMSeg 相关依赖，并且命令是在本包 <code>mmsegmentation-main/</code> 根目录下运行，Python 会优先使用本包内的 <code>mmseg/</code> 源码。</p>
 <hr>
 <h2 id="1"><a class="toclink" href="#1">1. 一句话概括</a><a class="headerlink" href="#1" title="Permanent link">¶</a></h2>
 <p>我们使用 DINOv3 作为图像特征提取器，用 MMSegmentation 中的 UPerNet 作为语义分割头，让模型对无人机遥感影像中的每个像素预测类别，例如 building、road、tree、car、human 和 background。</p>
@@ -408,15 +433,15 @@ footer.foot {
 </code></pre></div>
 
 <hr>
-<h2 id="2"><a class="toclink" href="#2">2. 这个包解决什么问题</a><a class="headerlink" href="#2" title="Permanent link">¶</a></h2>
-<p>很多非 AI 背景的学生主要卡在四个地方：</p>
+<h2 id="2"><a class="toclink" href="#2">2. 这套教程涵盖什么</a><a class="headerlink" href="#2" title="Permanent link">¶</a></h2>
+<p>如果你是非 AI 背景, 入门时通常会卡在以下四个问题:</p>
 <ol>
 <li>不知道语义分割标签应该长什么样。</li>
 <li>不知道 MMSegmentation 项目里哪些文件是必须修改的。</li>
 <li>不知道如何把自己的数据集注册成 MMSeg 可以读取的 dataset。</li>
 <li>不知道训练完成后如何评估和可视化结果。</li>
 </ol>
-<p>本教程包把这些内容整理成一套最小但完整的样例：</p>
+<p>本教程提供一套最小但完整的样例来覆盖以上每个问题:</p>
 <ul>
 <li>一个 UAVid 风格的小样例数据集。</li>
 <li>一个自定义 <code>UAVIDDataset</code>。</li>
@@ -427,9 +452,9 @@ footer.foot {
 <li>一个已经在服务器验证过的 smoke test。</li>
 <li>一个已经生成好的单图预测可视化结果。</li>
 </ul>
-<p>这个包的目标不是提供最高精度训练结果，而是提供可复现的教学入口。真正实验精度应当使用完整 UAVid 数据、官方 DINOv3 权重和完整训练配置。</p>
+<p>本教程不追求最高精度训练结果，而是提供可复现的教学入口。真正实验精度应当使用完整 UAVid 数据、官方 DINOv3 权重和完整训练配置。</p>
 <hr>
-<h2 id="3"><a class="toclink" href="#3">3. 当前包的目录结构</a><a class="headerlink" href="#3" title="Permanent link">¶</a></h2>
+<h2 id="3"><a class="toclink" href="#3">3. 教程包的目录结构</a><a class="headerlink" href="#3" title="Permanent link">¶</a></h2>
 <p>当前本地目录：</p>
 <div class="codehilite"><pre><span></span><code>mmseg+dinov3/
   DINOv3_MMSeg_UAVid_Tutorial.md
@@ -506,15 +531,15 @@ footer.foot {
 </code></pre></div>
 
 <hr>
-<h2 id="4"><a class="toclink" href="#4">4. 不包含什么</a><a class="headerlink" href="#4" title="Permanent link">¶</a></h2>
-<p>当前包不包含：</p>
+<h2 id="4"><a class="toclink" href="#4">4. 你需要自行准备的东西</a><a class="headerlink" href="#4" title="Permanent link">¶</a></h2>
+<p>以下资源不在教程包内, 需要你自行准备:</p>
 <ul>
 <li>大体积 DINOv3 官方预训练权重。</li>
 <li>完整 UAVid 数据集。</li>
 <li>正式实验使用的所有 SLURM 脚本。</li>
 <li>适合发表论文的完整训练结果。</li>
 </ul>
-<p>当前包已经包含可直接运行所需的 <code>mmseg/</code> Python 源码、<code>train.py</code>、<code>test.py</code>、项目 config、自定义 DINOv3 backbone、自定义 UAVid dataset 和工具脚本。正确使用方式是：</p>
+<p>本教程包已经包含可直接运行所需的 <code>mmseg/</code> Python 源码、<code>train.py</code>、<code>test.py</code>、项目 config、自定义 DINOv3 backbone、自定义 UAVid dataset 和工具脚本。正确使用方式是：</p>
 <div class="codehilite"><pre><span></span><code>安装兼容的 MMSeg/OpenMMLab 环境
 进入 mmseg+dinov3/mmsegmentation-main/
 按教程传入 DINOv3 checkpoint 和数据路径运行
@@ -525,16 +550,13 @@ footer.foot {
 </code></pre></div>
 
 <p>这里的“安装 MMSeg/OpenMMLab 环境”指安装运行依赖，例如 PyTorch、MMCV、MMEngine、OpenMIM 等；不是让学生再去下载另一个 MMSeg 源码目录。本包中的 <code>mmsegmentation-main/mmseg/</code> 就是运行时会被 Python 导入的 MMSeg 源码。</p>
-<hr>
-<h2 id="5-dinov3"><a class="toclink" href="#5-dinov3">5. DINOv3 在这里是什么</a><a class="headerlink" href="#5-dinov3" title="Permanent link">¶</a></h2>
+<h2 id="5-dinov3"><a class="toclink" href="#5-dinov3">5. DINOv3 的作用</a><a class="headerlink" href="#5-dinov3" title="Permanent link">¶</a></h2>
 <p>DINOv3 是一种自监督视觉基础模型。简单说，它先在大量无标签图像上学习通用视觉特征，然后可以迁移到下游任务。</p>
-<p>在本教程里：</p>
-<ul>
-<li>DINOv3 不直接输出语义分割图。</li>
-<li>DINOv3 负责把输入影像编码成高层视觉特征。</li>
-<li>UPerNet 负责把这些特征转换成逐像素类别预测。</li>
-</ul>
-<p>可以把它理解为：</p>
+<p>本教程中, DINOv3 的角色是:
+- DINOv3 不直接输出语义分割图。
+- DINOv3 负责把输入影像编码成高层视觉特征。
+- UPerNet 负责把这些特征转换成逐像素类别预测。</p>
+<p>你可以这样理解:</p>
 <div class="codehilite"><pre><span></span><code>DINOv3: 负责看懂图像内容
 UPerNet: 负责把看懂的内容画成语义分割结果
 </code></pre></div>
@@ -1064,7 +1086,7 @@ NumPy
 <p>由于 OpenMMLab 生态对 PyTorch、CUDA、MMCV 版本组合比较敏感，教学时建议不要让初学者从零安装。更稳妥的方式是提供一个已经配置好的 conda 环境，然后让学生只改数据路径和配置。</p>
 <hr>
 <h2 id="13"><a class="toclink" href="#13">13. 直接进入教程包运行</a><a class="headerlink" href="#13" title="Permanent link">¶</a></h2>
-<p>当前包已经包含完整 <code>mmseg/</code> Python 源码目录，因此不再需要把教程文件覆盖到另一个 MMSeg 仓库里。</p>
+<p>本教程包已经包含完整 <code>mmseg/</code> Python 源码目录，因此不再需要把教程文件覆盖到另一个 MMSeg 仓库里。</p>
 <p>进入项目根目录：</p>
 <div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/mmseg+dinov3/mmsegmentation-main
 </code></pre></div>
@@ -1114,7 +1136,7 @@ ls<span class="w"> </span>tools/check_uavid_dataset.py
 <p>这类文件需要使用者自己准备或在服务器上指定路径。</p>
 <hr>
 <h2 id="14-dinov3"><a class="toclink" href="#14-dinov3">14. DINOv3 权重路径</a><a class="headerlink" href="#14-dinov3" title="Permanent link">¶</a></h2>
-<p>DINOv3 权重较大，因此当前包不包含权重文件。</p>
+<p>DINOv3 权重文件较大, 需要你从 Meta 官方仓库自行下载。</p>
 <p>服务器使用过的 DINOv3 ViT-B 权重路径：</p>
 <div class="codehilite"><pre><span></span><code>/path/to/dinov3_vitb16_pretrain_lvd1689m.pth
 </code></pre></div>
@@ -2387,6 +2409,77 @@ backbone 是否冻结
 </code></pre></div>
 
 <p>只有这六步都通过，才建议启动完整训练。</p>
+<h3 id="2011"><a class="toclink" href="#2011">20.11 给学生发包时的最小复现流程</a><a class="headerlink" href="#2011" title="Permanent link">¶</a></h3>
+<p>如果本教程要发给一个没有接触过项目的人，建议让对方按下面顺序做。这个顺序比“先讲所有 config 细节”更稳，因为每一步都能定位一类错误。</p>
+<p>第一步，进入本包代码根目录：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/mmseg+dinov3/mmsegmentation-main
+</code></pre></div>
+
+<p>第二步，确认 Python 导入的是本包自带的 <code>mmseg</code>：</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;&#39;PY&#39;</span>
+<span class="s">import mmseg</span>
+<span class="s">print(mmseg.__file__)</span>
+<span class="s">PY</span>
+</code></pre></div>
+
+<p>正确输出应包含：</p>
+<div class="codehilite"><pre><span></span><code>mmseg+dinov3/mmsegmentation-main/mmseg/__init__.py
+</code></pre></div>
+
+<p>第三步，确认核心注册项存在：</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;&#39;PY&#39;</span>
+<span class="s">from mmseg.registry import DATASETS, MODELS, TRANSFORMS</span>
+<span class="s">print(&#39;UAVIDDataset:&#39;, DATASETS.get(&#39;UAVIDDataset&#39;))</span>
+<span class="s">print(&#39;DINOv3ViT:&#39;, MODELS.get(&#39;DINOv3ViT&#39;))</span>
+<span class="s">print(&#39;UAVidColorToId:&#39;, TRANSFORMS.get(&#39;UAVidColorToId&#39;))</span>
+<span class="s">PY</span>
+</code></pre></div>
+
+<p>如果 <code>DINOv3ViT</code> 是 <code>None</code>，优先检查主 config 里的 <code>custom_imports</code>，以及：</p>
+<div class="codehilite"><pre><span></span><code>mmseg/models/backbones/__init__.py
+mmseg/models/backbones/dinov3_BACKBONE.py
+</code></pre></div>
+
+<p>第四步，检查 sample data：</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>tools/check_uavid_dataset.py<span class="w"> </span>sample_data/uavid_v1.5_official_release_image
+</code></pre></div>
+
+<p>第五步，配置或传入 DINOv3 checkpoint。教程包不包含大权重，使用者需要自己提供：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">DINO_CKPT</span><span class="o">=</span>/absolute/path/to/dinov3_vitb16_pretrain_lvd1689m-*.pth
+</code></pre></div>
+
+<p>第六步，先跑短训练。短训练的目的只是证明 pipeline 能运行，不看精度：</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--config<span class="w"> </span>projects/UAVid_dataset/configs/vit_dinov3_uavid_512_default.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--work-dir<span class="w"> </span>work_dirs/smoke_sample<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cfg-options<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.backbone.pretrained<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DINO_CKPT</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>train_cfg.max_iters<span class="o">=</span><span class="m">20</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>train_cfg.val_interval<span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>default_hooks.checkpoint.interval<span class="o">=</span><span class="m">10</span>
+</code></pre></div>
+
+<p>第七步，测试短训练 checkpoint：</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--config<span class="w"> </span>projects/UAVid_dataset/configs/vit_dinov3_uavid_512_default.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--checkpoint<span class="w"> </span>work_dirs/smoke_sample/iter_20.pth<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cfg-options<span class="w"> </span>model.backbone.pretrained<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DINO_CKPT</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>第八步，换成自己的数据。优先只改数据路径和类别，不要同时换 head、换 backbone、改学习率：</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">DATA_ROOT</span><span class="o">=</span>/absolute/path/to/my_dataset
+
+python<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--config<span class="w"> </span>projects/UAVid_dataset/configs/vit_dinov3_uavid_512_default.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--work-dir<span class="w"> </span>work_dirs/my_dataset_upernet<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cfg-options<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.backbone.pretrained<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DINO_CKPT</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>train_dataloader.dataset.data_root<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DATA_ROOT</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>val_dataloader.dataset.data_root<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DATA_ROOT</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>test_dataloader.dataset.data_root<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DATA_ROOT</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<p>第九步，确认自己的数据能稳定训练和评估后，再考虑换分割头，例如 FCNHead、PSPHead、SegformerHead 或自定义 head。不要把“换数据集”和“换 head”放在第一次迁移里一起做。</p>
 <hr>
 <h2 id="21"><a class="toclink" href="#21">21. 评估指标解释</a><a class="headerlink" href="#21" title="Permanent link">¶</a></h2>
 <p>MMSeg 在这个配置下主要输出：</p>
@@ -2577,7 +2670,7 @@ default_hooks.checkpoint.interval<span class="o">=</span><span class="m">10</spa
 </code></pre></div>
 
 <hr>
-<h2 id="26"><a class="toclink" href="#26">26. 给学生的最小检查清单</a><a class="headerlink" href="#26" title="Permanent link">¶</a></h2>
+<h2 id="26"><a class="toclink" href="#26">26. 启动前最小检查清单</a><a class="headerlink" href="#26" title="Permanent link">¶</a></h2>
 <p>训练前：</p>
 <div class="codehilite"><pre><span></span><code>[ ] 兼容的 MMSeg/OpenMMLab 环境能运行。
 [ ] 当前目录是 `mmseg+dinov3/mmsegmentation-main`。

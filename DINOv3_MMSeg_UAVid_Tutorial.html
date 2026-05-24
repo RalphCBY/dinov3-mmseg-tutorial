@@ -401,14 +401,6 @@ footer.foot {
 <li>让学生能在一个已有 MMSegmentation 环境里跑通训练、测试和单图推理。</li>
 <li>让学生能读懂 <code>mIoU</code>、<code>mAcc</code>、<code>aAcc</code>、per-class IoU 等评估结果。</li>
 </ul>
-<p>当前教程包路径：</p>
-<div class="codehilite"><pre><span></span><code>/Users/bingyu/Documents/Project/UAVssl/CoRe-MAE/mmseg+dinov3
-</code></pre></div>
-
-<p>当前教程包里的 MMSeg 覆盖文件路径：</p>
-<div class="codehilite"><pre><span></span><code>/Users/bingyu/Documents/Project/UAVssl/CoRe-MAE/mmseg+dinov3/mmsegmentation-main
-</code></pre></div>
-
 <p>注意：这个包不是完整的 MMSegmentation 源码仓库。它是一个 overlay 包，里面只放了我们当前教程需要的自定义文件、样例数据、工具脚本和验证记录。真正训练时，应当把这些文件复制到一个能正常运行的完整 MMSegmentation 仓库中。</p>
 <hr>
 <h2 id="1"><a class="toclink" href="#1">1. 一句话概括</a><a class="headerlink" href="#1" title="Permanent link">¶</a></h2>
@@ -454,7 +446,7 @@ footer.foot {
 <hr>
 <h2 id="3"><a class="toclink" href="#3">3. 当前包的目录结构</a><a class="headerlink" href="#3" title="Permanent link">¶</a></h2>
 <p>当前本地目录：</p>
-<div class="codehilite"><pre><span></span><code>CoRe-MAE/mmseg+dinov3/
+<div class="codehilite"><pre><span></span><code>mmseg+dinov3/
   DINOv3_MMSeg_UAVid_Tutorial.md
   SERVER_VERIFICATION.md
   server_verification_20260524/
@@ -517,7 +509,6 @@ footer.foot {
 <div class="codehilite"><pre><span></span><code>projects/UAVid_dataset/
 </code></pre></div>
 
-<p>不要把教程包中的主配置路径写成 <code>projects/FiveBPixel_dataset/...</code>。历史服务器上有一个完整实验仓库仍然使用 <code>FiveBPixel_dataset</code> 这个目录名，但当前教学包使用的是 <code>UAVid_dataset</code>。</p>
 <hr>
 <h2 id="4"><a class="toclink" href="#4">4. 不包含什么</a><a class="headerlink" href="#4" title="Permanent link">¶</a></h2>
 <p>当前包不包含：</p>
@@ -761,7 +752,7 @@ Dataset check passed.
 </code></pre></div>
 
 <p>真实服务器 UAVid 路径示例：</p>
-<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>tools/check_uavid_dataset.py<span class="w"> </span>/file_storage01/home/xinsu/bingyucui/dataset/uavid_v1.5_official_release_image
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>tools/check_uavid_dataset.py<span class="w"> </span>/path/to/uavid_v1.5_official_release_image
 </code></pre></div>
 
 <hr>
@@ -906,7 +897,7 @@ test:  seq34
 </code></pre></div>
 
 <p>不要写成：</p>
-<div class="codehilite"><pre><span></span><code>projects/FiveBPixel_dataset/configs/vit_dinov3_uavid_512_default.py
+<div class="codehilite"><pre><span></span><code>projects/UAVid_dataset/configs/vit_dinov3_uavid_512_default.py
 </code></pre></div>
 
 <p>当前主配置的 base 文件：</p>
@@ -1080,12 +1071,12 @@ NumPy
 </code></pre></div>
 
 <p>教程 overlay 包是：</p>
-<div class="codehilite"><pre><span></span><code>/path/to/CoRe-MAE/mmseg+dinov3/mmsegmentation-main
+<div class="codehilite"><pre><span></span><code>/path/to/mmsegmentation-main
 </code></pre></div>
 
 <p>复制方式：</p>
 <div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/full/mmsegmentation-main
-cp<span class="w"> </span>-r<span class="w"> </span>/path/to/CoRe-MAE/mmseg+dinov3/mmsegmentation-main/*<span class="w"> </span>.
+cp<span class="w"> </span>-r<span class="w"> </span>/path/to/mmsegmentation-main/*<span class="w"> </span>.
 </code></pre></div>
 
 <p>复制后检查：</p>
@@ -1103,7 +1094,7 @@ ls<span class="w"> </span>tools/check_uavid_dataset.py
 <h2 id="14-dinov3"><a class="toclink" href="#14-dinov3">14. DINOv3 权重路径</a><a class="headerlink" href="#14-dinov3" title="Permanent link">¶</a></h2>
 <p>DINOv3 权重较大，因此当前包不包含权重文件。</p>
 <p>服务器使用过的 DINOv3 ViT-B 权重路径：</p>
-<div class="codehilite"><pre><span></span><code>/file_storage01/home/xinsu/bingyucui/ckpt/dinov3/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth
+<div class="codehilite"><pre><span></span><code>/path/to/dinov3_vitb16_pretrain_lvd1689m.pth
 </code></pre></div>
 
 <p>运行前设置：</p>
@@ -1245,7 +1236,7 @@ per-class Acc
 </code></pre></div>
 
 <p>示例：</p>
-<div class="codehilite"><pre><span></span><code><span class="nv">TUTORIAL_ROOT</span><span class="o">=</span>/path/to/CoRe-MAE/mmseg+dinov3
+<div class="codehilite"><pre><span></span><code><span class="nv">TUTORIAL_ROOT</span><span class="o">=</span>/path/to/tutorial-package
 <span class="nv">FULL_REPO</span><span class="o">=</span>/path/to/full/mmsegmentation-main
 
 python<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TUTORIAL_ROOT</span><span class="s2">/server_verification_20260524/infer_seq16_000000_dinov3_upernet.py&quot;</span><span class="w"> </span><span class="se">\</span>
@@ -1273,7 +1264,7 @@ seq16_000000_overlay.png
 <hr>
 <h2 id="19-uavid"><a class="toclink" href="#19-uavid">19. 在真实 UAVid 数据上训练</a><a class="headerlink" href="#19-uavid" title="Permanent link">¶</a></h2>
 <p>真实数据根目录示例：</p>
-<div class="codehilite"><pre><span></span><code>/file_storage01/home/xinsu/bingyucui/dataset/uavid_v1.5_official_release_image
+<div class="codehilite"><pre><span></span><code>/path/to/uavid_v1.5_official_release_image
 </code></pre></div>
 
 <p>真实 UAVid 结构：</p>
@@ -1300,14 +1291,14 @@ seq16_000000_overlay.png
 </code></pre></div>
 
 <p>正式训练前建议先检查：</p>
-<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>tools/check_uavid_dataset.py<span class="w"> </span>/file_storage01/home/xinsu/bingyucui/dataset/uavid_v1.5_official_release_image
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>tools/check_uavid_dataset.py<span class="w"> </span>/path/to/uavid_v1.5_official_release_image
 </code></pre></div>
 
 <p>正式训练命令示例：</p>
 <div class="codehilite"><pre><span></span><code><span class="nv">CONFIG</span><span class="o">=</span>projects/UAVid_dataset/configs/vit_dinov3_uavid_512_default.py
 <span class="nv">WORK_DIR</span><span class="o">=</span>work_dirs/dinov3_uavid_full
-<span class="nv">DINO_CKPT</span><span class="o">=</span>/file_storage01/home/xinsu/bingyucui/ckpt/dinov3/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth
-<span class="nv">DATA_ROOT</span><span class="o">=</span>/file_storage01/home/xinsu/bingyucui/dataset/uavid_v1.5_official_release_image
+<span class="nv">DINO_CKPT</span><span class="o">=</span>/path/to/dinov3_vitb16_pretrain_lvd1689m.pth
+<span class="nv">DATA_ROOT</span><span class="o">=</span>/path/to/uavid_v1.5_official_release_image
 
 python<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--config<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CONFIG</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>

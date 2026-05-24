@@ -318,7 +318,7 @@ footer.foot {
 </ul>
 </li>
 <li><a href="#12">12. 环境准备</a></li>
-<li><a href="#13-mmseg">13. 把教程文件放进完整 MMSeg 仓库</a></li>
+<li><a href="#13">13. 直接进入教程包运行</a></li>
 <li><a href="#14-dinov3">14. DINOv3 权重路径</a></li>
 <li><a href="#15-sample-data">15. 先跑 sample data 检查</a></li>
 <li><a href="#16-smoke-training">16. 最小 smoke training</a></li>
@@ -401,7 +401,15 @@ footer.foot {
 <li>让学生能在一个已有 MMSegmentation 环境里跑通训练、测试和单图推理。</li>
 <li>让学生能读懂 <code>mIoU</code>、<code>mAcc</code>、<code>aAcc</code>、per-class IoU 等评估结果。</li>
 </ul>
-<p>注意：这个包不是完整的 MMSegmentation 源码仓库。它是一个 overlay 包，里面只放了我们当前教程需要的自定义文件、样例数据、工具脚本和验证记录。真正训练时，应当把这些文件复制到一个能正常运行的完整 MMSegmentation 仓库中。</p>
+<p>注意：当前版本已经不再是残缺 overlay。<code>mmsegmentation-main/mmseg/</code> 已包含从服务器工作项目复制来的完整 MMSeg Python 源码目录，因此学生安装好兼容的 OpenMMLab/MMSeg 环境后，可以直接进入本包的 <code>mmsegmentation-main/</code> 运行教程命令。大体积 DINOv3 权重、完整 UAVid 数据、SLURM 日志和训练输出不包含在包内，需要按教程单独指定路径。</p>
+<p>更准确地说，这个教学包采用的是：</p>
+<div class="codehilite"><pre><span></span><code>环境依赖由 conda/pip 安装
+MMSeg Python 源码由本包自带
+教程代码、config、sample data 也由本包自带
+大权重和正式数据集由使用者自己提供路径
+</code></pre></div>
+
+<p>所以学生不需要再单独下载另一个 MMSegmentation 源码包。只要环境中有兼容的 PyTorch、MMCV、MMEngine、OpenMIM/MMSeg 相关依赖，并且命令是在本包 <code>mmsegmentation-main/</code> 根目录下运行，Python 会优先使用本包内的 <code>mmseg/</code> 源码。</p>
 <hr>
 <h2 id="1"><a class="toclink" href="#1">1. 一句话概括</a><a class="headerlink" href="#1" title="Permanent link">¶</a></h2>
 <p>我们使用 DINOv3 作为图像特征提取器，用 MMSegmentation 中的 UPerNet 作为语义分割头，让模型对无人机遥感影像中的每个像素预测类别，例如 building、road、tree、car、human 和 background。</p>
@@ -439,6 +447,7 @@ footer.foot {
 <li>一个 RGB label 转 class id 的 transform。</li>
 <li>一个 DINOv3 ViT-B backbone wrapper。</li>
 <li>一个可训练、可测试、可推理的 MMSeg config。</li>
+<li>一份完整的 <code>mmseg/</code> Python 源码目录，包含 <code>apis</code>、<code>engine</code>、<code>registry</code>、<code>decode_heads</code>、<code>losses</code>、<code>necks</code>、<code>segmentors</code> 等 MMSeg 核心模块。</li>
 <li>一个已经在服务器验证过的 smoke test。</li>
 <li>一个已经生成好的单图预测可视化结果。</li>
 </ul>
@@ -458,6 +467,13 @@ footer.foot {
   train.py
   test.py
   mmseg/
+    apis/
+    engine/
+    evaluation/
+    registry/
+    structures/
+    utils/
+    visualization/
     datasets/
       __init__.py
       uavid.py
@@ -472,6 +488,10 @@ footer.foot {
         mae_copy2_BACKBONE.py
         dinov3/
           ...
+      decode_heads/
+      losses/
+      necks/
+      segmentors/
   projects/
     UAVid_dataset/
       _base_/
@@ -514,19 +534,21 @@ footer.foot {
 <p>当前包不包含：</p>
 <ul>
 <li>大体积 DINOv3 官方预训练权重。</li>
-<li>完整 MMSegmentation 源码仓库。</li>
 <li>完整 UAVid 数据集。</li>
 <li>正式实验使用的所有 SLURM 脚本。</li>
 <li>适合发表论文的完整训练结果。</li>
 </ul>
-<p>因此正确使用方式是：</p>
-<div class="codehilite"><pre><span></span><code>把 mmseg+dinov3/mmsegmentation-main/ 里的文件覆盖到一个可运行的完整 MMSegmentation 仓库中。
+<p>当前包已经包含可直接运行所需的 <code>mmseg/</code> Python 源码、<code>train.py</code>、<code>test.py</code>、项目 config、自定义 DINOv3 backbone、自定义 UAVid dataset 和工具脚本。正确使用方式是：</p>
+<div class="codehilite"><pre><span></span><code>安装兼容的 MMSeg/OpenMMLab 环境
+进入 mmseg+dinov3/mmsegmentation-main/
+按教程传入 DINOv3 checkpoint 和数据路径运行
 </code></pre></div>
 
-<p>而不是：</p>
-<div class="codehilite"><pre><span></span><code>直接把这个 overlay 包当成完整 MMSegmentation 项目运行。
+<p>不需要再：</p>
+<div class="codehilite"><pre><span></span><code>额外 clone 一个完整 OpenMMLab MMSegmentation 源码仓库再覆盖文件。
 </code></pre></div>
 
+<p>这里的“安装 MMSeg/OpenMMLab 环境”指安装运行依赖，例如 PyTorch、MMCV、MMEngine、OpenMIM 等；不是让学生再去下载另一个 MMSeg 源码目录。本包中的 <code>mmsegmentation-main/mmseg/</code> 就是运行时会被 Python 导入的 MMSeg 源码。</p>
 <hr>
 <h2 id="5-dinov3"><a class="toclink" href="#5-dinov3">5. DINOv3 在这里是什么</a><a class="headerlink" href="#5-dinov3" title="Permanent link">¶</a></h2>
 <p>DINOv3 是一种自监督视觉基础模型。简单说，它先在大量无标签图像上学习通用视觉特征，然后可以迁移到下游任务。</p>
@@ -730,7 +752,7 @@ total:             30 image-label pairs
 <li>是否缺少 label。</li>
 <li>label 中是否有不在 UAVid palette 里的未知颜色。</li>
 </ul>
-<p>在完整 MMSeg 仓库根目录运行：</p>
+<p>在当前教程包的 <code>mmsegmentation-main/</code> 根目录运行：</p>
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>tools/check_uavid_dataset.py<span class="w"> </span>sample_data/uavid_v1.5_official_release_image
 </code></pre></div>
 
@@ -1065,31 +1087,55 @@ NumPy
 
 <p>由于 OpenMMLab 生态对 PyTorch、CUDA、MMCV 版本组合比较敏感，教学时建议不要让初学者从零安装。更稳妥的方式是提供一个已经配置好的 conda 环境，然后让学生只改数据路径和配置。</p>
 <hr>
-<h2 id="13-mmseg"><a class="toclink" href="#13-mmseg">13. 把教程文件放进完整 MMSeg 仓库</a><a class="headerlink" href="#13-mmseg" title="Permanent link">¶</a></h2>
-<p>假设完整 MMSeg 仓库是：</p>
-<div class="codehilite"><pre><span></span><code>/path/to/full/mmsegmentation-main
+<h2 id="13"><a class="toclink" href="#13">13. 直接进入教程包运行</a><a class="headerlink" href="#13" title="Permanent link">¶</a></h2>
+<p>当前包已经包含完整 <code>mmseg/</code> Python 源码目录，因此不再需要把教程文件覆盖到另一个 MMSeg 仓库里。</p>
+<p>进入项目根目录：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/mmseg+dinov3/mmsegmentation-main
 </code></pre></div>
 
-<p>教程 overlay 包是：</p>
-<div class="codehilite"><pre><span></span><code>/path/to/mmsegmentation-main
-</code></pre></div>
-
-<p>复制方式：</p>
-<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/full/mmsegmentation-main
-cp<span class="w"> </span>-r<span class="w"> </span>/path/to/mmsegmentation-main/*<span class="w"> </span>.
-</code></pre></div>
-
-<p>复制后检查：</p>
+<p>检查关键文件：</p>
 <div class="codehilite"><pre><span></span><code>ls<span class="w"> </span>train.py<span class="w"> </span>test.py
-ls<span class="w"> </span>projects/UAVid_dataset/configs/vit_dinov3_uavid_512_default.py
-ls<span class="w"> </span>projects/UAVid_dataset/_base_/datasets/uavid.py
-ls<span class="w"> </span>mmseg/datasets/uavid.py
+ls<span class="w"> </span>mmseg/registry.py
+ls<span class="w"> </span>mmseg/apis
+ls<span class="w"> </span>mmseg/engine
+ls<span class="w"> </span>mmseg/models/decode_heads
 ls<span class="w"> </span>mmseg/models/backbones/dinov3_BACKBONE.py
+ls<span class="w"> </span>projects/UAVid_dataset/configs/vit_dinov3_uavid_512_default.py
 ls<span class="w"> </span>tools/uavid_color_to_id.py
 ls<span class="w"> </span>tools/check_uavid_dataset.py
 </code></pre></div>
 
-<p>如果这些文件不存在，说明 overlay 没有放到正确位置。</p>
+<p>如果 <code>mmseg/registry.py</code>、<code>mmseg/apis</code>、<code>mmseg/engine</code>、<code>mmseg/models/decode_heads</code> 不存在，说明拿到的不是当前可运行版本，而是旧的 overlay 版本。</p>
+<p>确认 Python 会优先使用本包内的 <code>mmseg</code>：</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;&#39;PY&#39;</span>
+<span class="s">import mmseg</span>
+<span class="s">print(mmseg.__file__)</span>
+<span class="s">PY</span>
+</code></pre></div>
+
+<p>期望输出路径类似：</p>
+<div class="codehilite"><pre><span></span><code>/path/to/mmseg+dinov3/mmsegmentation-main/mmseg/__init__.py
+</code></pre></div>
+
+<p>这说明当前命令会使用教程包自带的 MMSeg 源码和自定义 DINOv3/UAVid 文件。</p>
+<p>如果学生希望从其他工作目录调用本包脚本，也可以显式设置：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span>/path/to/mmseg+dinov3/mmsegmentation-main:<span class="nv">$PYTHONPATH</span>
+</code></pre></div>
+
+<p>但教学时更推荐直接进入本包根目录运行：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/mmseg+dinov3/mmsegmentation-main
+</code></pre></div>
+
+<p>这样路径最少，初学者最不容易把外部安装的 <code>mmseg</code> 包和本包自带的 <code>mmseg</code> 源码混在一起。</p>
+<p>本包仍然不是“完整实验工作区”。它不包含：</p>
+<div class="codehilite"><pre><span></span><code>正式训练产生的 work_dirs/
+大体积 DINOv3 权重
+完整 UAVid 官方数据集
+服务器 SLURM 脚本和日志
+论文实验 checkpoint
+</code></pre></div>
+
+<p>这类文件需要使用者自己准备或在服务器上指定路径。</p>
 <hr>
 <h2 id="14-dinov3"><a class="toclink" href="#14-dinov3">14. DINOv3 权重路径</a><a class="headerlink" href="#14-dinov3" title="Permanent link">¶</a></h2>
 <p>DINOv3 权重较大，因此当前包不包含权重文件。</p>
@@ -1108,8 +1154,8 @@ ls<span class="w"> </span>tools/check_uavid_dataset.py
 <p>如果忘记传这个参数，<code>pretrained=None</code>，模型不会加载 DINOv3 官方权重。对于教学 smoke test，这会导致权重加载证据缺失；对于正式训练，这通常不是想要的结果。</p>
 <hr>
 <h2 id="15-sample-data"><a class="toclink" href="#15-sample-data">15. 先跑 sample data 检查</a><a class="headerlink" href="#15-sample-data" title="Permanent link">¶</a></h2>
-<p>进入完整 MMSeg 仓库根目录：</p>
-<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/full/mmsegmentation-main
+<p>进入当前教程包的 <code>mmsegmentation-main/</code> 根目录：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>/path/to/mmseg+dinov3/mmsegmentation-main
 </code></pre></div>
 
 <p>检查 sample data：</p>
@@ -1226,8 +1272,8 @@ per-class Acc
 <li>打印每类预测像素数量。</li>
 </ul>
 <p>脚本参数：</p>
-<div class="codehilite"><pre><span></span><code>--repo:        完整 MMSeg repo 路径
---config:      MMSeg config 路径
+<div class="codehilite"><pre><span></span><code>--repo:        本包 mmsegmentation-main 路径
+--config:      MMSeg config 路径，通常在本包 projects/UAVid_dataset/configs/ 下
 --checkpoint:  训练好的分割模型 checkpoint
 --pretrained:  DINOv3 backbone 预训练权重
 --image:       输入影像
@@ -1237,7 +1283,7 @@ per-class Acc
 
 <p>示例：</p>
 <div class="codehilite"><pre><span></span><code><span class="nv">TUTORIAL_ROOT</span><span class="o">=</span>/path/to/tutorial-package
-<span class="nv">FULL_REPO</span><span class="o">=</span>/path/to/full/mmsegmentation-main
+<span class="nv">FULL_REPO</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$TUTORIAL_ROOT</span><span class="s2">/mmsegmentation-main&quot;</span>
 
 python<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TUTORIAL_ROOT</span><span class="s2">/server_verification_20260524/infer_seq16_000000_dinov3_upernet.py&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--repo<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FULL_REPO</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
@@ -1356,6 +1402,34 @@ palette
 num_classes
 </code></pre></div>
 
+<p>这一条是给初学者的最短路径。它的前提是：你的数据能整理成 <code>split/seq/Images</code> 和 <code>split/seq/Labels</code> 这种结构，并且每张图与标签同名。如果你的数据不是这种目录结构，例如所有图片在一个文件夹、标签文件名有后缀、标签存在 JSON/GeoJSON/shapefile 中，或者 train/val/test 用 txt 列表管理，就不要硬套 <code>UAVIDDataset</code>。那时更清楚的做法是新建一个 dataset class，并在 config 里注册它。</p>
+<p>可以把适配分成三档：</p>
+<table>
+<thead>
+<tr>
+<th>情况</th>
+<th>推荐做法</th>
+<th>需要改的文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据目录和 UAVid 类似，只是路径不同</td>
+<td>直接改 <code>data_root</code> 和 <code>sequences</code></td>
+<td><code>projects/UAVid_dataset/_base_/datasets/uavid.py</code> 或命令行 <code>--cfg-options</code></td>
+</tr>
+<tr>
+<td>目录类似，但类别/颜色不同</td>
+<td>沿用 <code>UAVIDDataset</code>，改类别、palette、num_classes</td>
+<td><code>mmseg/datasets/uavid.py</code>、<code>projects/UAVid_dataset/_base_/datasets/uavid.py</code>、主 config</td>
+</tr>
+<tr>
+<td>目录/标签格式完全不同</td>
+<td>新建 dataset class 和 dataset base config</td>
+<td><code>mmseg/datasets/your_dataset.py</code>、<code>projects/YourDataset/_base_/datasets/*.py</code>、<code>projects/YourDataset/configs/*.py</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="201"><a class="toclink" href="#201">20.1 如果只是换数据路径</a><a class="headerlink" href="#201" title="Permanent link">¶</a></h3>
 <p>只改数据路径：</p>
 <div class="codehilite"><pre><span></span><code><span class="nv">DATA_ROOT</span><span class="o">=</span>/absolute/path/to/my_dataset
@@ -1489,7 +1563,7 @@ valid class id = 0 到 num_classes - 1
 
 <p>这样别人拿到代码后，可以继续使用标准 MMSeg 命令：</p>
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span>--config<span class="w"> </span>your_config.py
-python<span class="w"> </span>test.py<span class="w"> </span>your_config.py<span class="w"> </span>your_checkpoint.pth
+python<span class="w"> </span>test.py<span class="w"> </span>--config<span class="w"> </span>your_config.py<span class="w"> </span>--checkpoint<span class="w"> </span>your_checkpoint.pth
 </code></pre></div>
 
 <h3 id="207"><a class="toclink" href="#207">20.7 如何更换下游语义分割头</a><a class="headerlink" href="#207" title="Permanent link">¶</a></h3>
@@ -1759,7 +1833,7 @@ loss_decode
 </code></pre></div>
 
 <p>主 config 同样要避免把 <code>auxiliary_head=None</code> 覆盖成一个 dict。</p>
-<p>SegformerHead 使用时要检查当前 MMSeg 版本是否已经包含该 head。可以在完整 MMSeg 仓库里运行：</p>
+<p>SegformerHead 使用时要检查当前 MMSeg 源码是否已经包含该 head。可以在本包 <code>mmsegmentation-main/</code> 根目录运行：</p>
 <div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-<span class="w"> </span><span class="s">&lt;&lt;&#39;PY&#39;</span>
 <span class="s">from mmseg.registry import MODELS</span>
 <span class="s">print(MODELS.get(&#39;SegformerHead&#39;))</span>
@@ -2325,7 +2399,7 @@ backbone 是否冻结
 </code></pre></div>
 
 <p>第五，跑测试：</p>
-<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>test.py<span class="w"> </span>your_config.py<span class="w"> </span>work_dirs/smoke_your_config/iter_20.pth
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>test.py<span class="w"> </span>--config<span class="w"> </span>your_config.py<span class="w"> </span>--checkpoint<span class="w"> </span>work_dirs/smoke_your_config/iter_20.pth
 </code></pre></div>
 
 <p>第六，做单图推理和 overlay：</p>
@@ -2474,7 +2548,7 @@ All 188 keys matched perfectly
 
 <p>是否存在，并且当前仓库根目录在 <code>PYTHONPATH</code> 中。</p>
 <p>在服务器 torchrun 中可以设置：</p>
-<div class="codehilite"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span>/path/to/full/mmsegmentation-main:<span class="nv">$PYTHONPATH</span>
+<div class="codehilite"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span>/path/to/mmseg+dinov3/mmsegmentation-main:<span class="nv">$PYTHONPATH</span>
 </code></pre></div>
 
 <h3 id="257-batchnorm-1x1"><a class="toclink" href="#257-batchnorm-1x1">25.7 BatchNorm 1x1 报错</a><a class="headerlink" href="#257-batchnorm-1x1" title="Permanent link">¶</a></h3>
@@ -2529,8 +2603,10 @@ default_hooks.checkpoint.interval<span class="o">=</span><span class="m">10</spa
 <hr>
 <h2 id="26"><a class="toclink" href="#26">26. 给学生的最小检查清单</a><a class="headerlink" href="#26" title="Permanent link">¶</a></h2>
 <p>训练前：</p>
-<div class="codehilite"><pre><span></span><code>[ ] 完整 MMSegmentation 环境能运行。
-[ ] 教程 overlay 文件已经复制到完整 MMSeg 仓库。
+<div class="codehilite"><pre><span></span><code>[ ] 兼容的 MMSeg/OpenMMLab 环境能运行。
+[ ] 当前目录是 `mmseg+dinov3/mmsegmentation-main`。
+[ ] `mmseg/registry.py`、`mmseg/apis`、`mmseg/engine`、`mmseg/models/decode_heads` 存在。
+[ ] `python -c &quot;import mmseg; print(mmseg.__file__)&quot;` 指向本包内的 `mmseg`。
 [ ] DINOv3 checkpoint 路径正确。
 [ ] data_root 指向包含 uavid_train/uavid_val/uavid_test 的目录。
 [ ] Images 和 Labels 文件名一一对应。

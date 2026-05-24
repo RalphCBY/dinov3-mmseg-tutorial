@@ -386,30 +386,6 @@ footer.foot {
 
     </nav>
     <main class="content">
-<p>本文档是 <code>mmseg+dinov3</code> 教程包的详细说明，也是给 PPT/HTML 专家制作教学材料时使用的事实源。</p>
-<p>目标读者：</p>
-<ul>
-<li>没有系统接触过 AI 或深度学习的遥感、测绘、地理信息、无人机影像方向学生。</li>
-<li>已经有自己的影像和逐像素标签，希望使用现成代码训练语义分割模型的人。</li>
-<li>需要理解 DINOv3、MMSegmentation、UAVid 数据格式、训练、测试、可视化和评估指标的人。</li>
-</ul>
-<p>核心目标：</p>
-<ul>
-<li>让学生知道语义分割任务到底在做什么。</li>
-<li>让学生知道 DINOv3 在这里扮演什么角色。</li>
-<li>让学生能把自己的影像和标签整理成可运行的数据格式。</li>
-<li>让学生能在一个已有 MMSegmentation 环境里跑通训练、测试和单图推理。</li>
-<li>让学生能读懂 <code>mIoU</code>、<code>mAcc</code>、<code>aAcc</code>、per-class IoU 等评估结果。</li>
-</ul>
-<p>注意：当前版本已经不再是残缺 overlay。<code>mmsegmentation-main/mmseg/</code> 已包含从服务器工作项目复制来的完整 MMSeg Python 源码目录，因此学生安装好兼容的 OpenMMLab/MMSeg 环境后，可以直接进入本包的 <code>mmsegmentation-main/</code> 运行教程命令。大体积 DINOv3 权重、完整 UAVid 数据、SLURM 日志和训练输出不包含在包内，需要按教程单独指定路径。</p>
-<p>更准确地说，这个教学包采用的是：</p>
-<div class="codehilite"><pre><span></span><code>环境依赖由 conda/pip 安装
-MMSeg Python 源码由本包自带
-教程代码、config、sample data 也由本包自带
-大权重和正式数据集由使用者自己提供路径
-</code></pre></div>
-
-<p>所以学生不需要再单独下载另一个 MMSegmentation 源码包。只要环境中有兼容的 PyTorch、MMCV、MMEngine、OpenMIM/MMSeg 相关依赖，并且命令是在本包 <code>mmsegmentation-main/</code> 根目录下运行，Python 会优先使用本包内的 <code>mmseg/</code> 源码。</p>
 <hr>
 <h2 id="1"><a class="toclink" href="#1">1. 一句话概括</a><a class="headerlink" href="#1" title="Permanent link">¶</a></h2>
 <p>我们使用 DINOv3 作为图像特征提取器，用 MMSegmentation 中的 UPerNet 作为语义分割头，让模型对无人机遥感影像中的每个像素预测类别，例如 building、road、tree、car、human 和 background。</p>

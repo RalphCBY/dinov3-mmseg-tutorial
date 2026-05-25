@@ -407,7 +407,7 @@ footer.foot {
 <li>知道语义分割任务到底在做什么。</li>
 <li>知道 DINOv3 在这里扮演什么角色。</li>
 <li>能把自己的影像和标签整理成可运行的数据格式。</li>
-<li>能在一个已有 MMSegmentation 环境里跑通训练、测试和单图推理。</li>
+<li>能从零创建或激活一个兼容的 MMSegmentation 运行环境，并跑通训练、测试和单图推理。</li>
 <li>能读懂 <code>mIoU</code>、<code>mAcc</code>、<code>aAcc</code>、per-class IoU 等评估结果。</li>
 </ul>
 <p><code>mmsegmentation-main/mmseg/</code> 已包含从服务器工作项目复制来的完整 MMSeg Python 源码目录，你安装好兼容的 OpenMMLab/MMSeg 环境后，可以直接进入本包的 <code>mmsegmentation-main/</code> 运行教程命令。大体积 DINOv3 权重、完整 UAVid 数据、SLURM 日志和训练输出不包含在包内，需要按教程单独指定路径。</p>
@@ -419,6 +419,7 @@ MMSeg Python 源码由本包自带
 </code></pre></div>
 
 <p>不需要再单独下载 MMSegmentation 源码包。只要环境中有兼容的 PyTorch、MMCV、MMEngine、OpenMIM/MMSeg 相关依赖，并且命令是在本包 <code>mmsegmentation-main/</code> 根目录下运行，Python 会优先使用本包内的 <code>mmseg/</code> 源码。</p>
+<p>实际教学时，建议把“创建环境”作为正式步骤讲，而不是默认学生已经有可用环境。本文第 12 节已经给出服务器已验证环境、从零创建 conda 环境、<code>environment.yml</code>、版本检查和 sample data smoke test。PPT/HTML 中可以把这一节压缩成一页“环境准备与自检”，但 MD 中需要保留完整命令，方便学生照着复制执行。</p>
 <hr>
 <h2 id="1"><a class="toclink" href="#1">1. 一句话概括</a><a class="headerlink" href="#1" title="Permanent link">¶</a></h2>
 <p>我们使用 DINOv3 作为图像特征提取器，用 MMSegmentation 中的 UPerNet 作为语义分割头，让模型对无人机遥感影像中的每个像素预测类别，例如 building、road、tree、car、human 和 background。</p>
@@ -553,6 +554,7 @@ MMSeg Python 源码由本包自带
 按教程传入 DINOv3 checkpoint 和数据路径运行
 </code></pre></div>
 
+<p>如果没有现成环境，应先按第 12 节创建 <code>mmseg310</code> 或等价环境，再进入代码目录运行。环境名不一定必须叫 <code>mmseg310</code>，关键是 PyTorch、CUDA、MMCV、MMEngine、MMSegmentation 等版本组合要兼容。</p>
 <p>不需要再：</p>
 <div class="codehilite"><pre><span></span><code>额外 clone 一个完整 OpenMMLab MMSegmentation 源码仓库再覆盖文件。
 </code></pre></div>

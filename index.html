@@ -596,7 +596,6 @@ html { scroll-behavior: smooth; }
 .script-card.sc-train { border-top-color: #2563EB; }
 .script-card.sc-test  { border-top-color: #2CA02C; }
 .script-card.sc-pred  { border-top-color: #D97706; }
-.script-card .ico { font-size: 24px; line-height: 1; }
 .script-card .role {
     position: absolute; top: 14px; right: 14px;
     width: 26px; height: 26px; border-radius: 50%;
@@ -607,7 +606,7 @@ html { scroll-behavior: smooth; }
 .script-card.sc-test  .role { background: #2CA02C; }
 .script-card.sc-pred  .role { background: #D97706; }
 .script-card h4 {
-    margin: 10px 0 6px; font-size: 15px;
+    margin: 2px 0 6px; font-size: 15px;
     font-family: "JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
     color: var(--navy-dark); border: 0; padding: 0;
 }
@@ -896,7 +895,7 @@ python<span class="w"> </span>predict.py<span class="w"> </span>...
 </code></pre></div>
 
 <p>但注意：CPU 预测会很慢，训练和 3840 x 2160 全尺寸滑窗预测都建议使用 GPU。</p>
-<h3 id="03"><a class="toclink" href="#03">0.3 三个入口脚本分别做什么</a><a class="headerlink" href="#03" title="Permanent link">¶</a></h3><div class="script-cards"><div class="script-card sc-train"><div class="ico">🎓</div><div class="role">学</div><h4>train.py</h4><p>用 <b>Images + Labels</b> 训练语义分割模型</p><p class="io">输出 → work_dirs/iter_*.pth</p></div><div class="script-card sc-test"><div class="ico">📊</div><div class="role">评</div><h4>test.py</h4><p>用 <b>Images + Labels</b> 评估已训练模型的精度</p><p class="io">输出 → mIoU / mAcc / aAcc</p></div><div class="script-card sc-pred"><div class="ico">🖼️</div><div class="role">用</div><h4>predict.py</h4><p>只用 <b>Images</b> 生成预测图,不计算 mIoU</p><p class="io">输出 → overlay / pred_color / pred_id</p></div></div>
+<h3 id="03"><a class="toclink" href="#03">0.3 三个入口脚本分别做什么</a><a class="headerlink" href="#03" title="Permanent link">¶</a></h3><div class="script-cards"><div class="script-card sc-train"><div class="role">学</div><h4>train.py</h4><p>用 <b>Images + Labels</b> 训练语义分割模型</p><p class="io">输出 → work_dirs/iter_*.pth</p></div><div class="script-card sc-test"><div class="role">评</div><h4>test.py</h4><p>用 <b>Images + Labels</b> 评估已训练模型的精度</p><p class="io">输出 → mIoU / mAcc / aAcc</p></div><div class="script-card sc-pred"><div class="role">用</div><h4>predict.py</h4><p>只用 <b>Images</b> 生成预测图,不计算 mIoU</p><p class="io">输出 → overlay / pred_color / pred_id</p></div></div>
 <table>
 <thead>
 <tr>

@@ -638,6 +638,7 @@ nav.toc li.collapsed > ul { display: none; }
 nav.toc li.collapsed > a .toc-caret,
 nav.toc li.collapsed .toc-caret { transform: rotate(-90deg); }
 nav.toc li.filter-hide { display: none; }
+nav.toc .toc-caret-empty { cursor: default; pointer-events: none; }
 
 /* === long code block collapse === */
 .code-wrap.collapsible .codehilite { max-height: 320px; overflow: hidden; transition: max-height 0.2s; }
@@ -4297,7 +4298,8 @@ default_hooks.checkpoint.interval<span class="o">=</span><span class="m">10</spa
     tocRoot.querySelectorAll("li").forEach(function (li) {
       var sub = li.querySelector(":scope > ul");
       var link = li.querySelector(":scope > a");
-      if (sub && link) {
+      if (!link) return;
+      if (sub) {
         li.classList.add("has-children", "collapsed");
         var caret = document.createElement("span");
         caret.className = "toc-caret";
@@ -4308,6 +4310,12 @@ default_hooks.checkpoint.interval<span class="o">=</span><span class="m">10</spa
           e.stopPropagation();
           li.classList.toggle("collapsed");
         });
+      } else {
+        // No children: insert an equal-width invisible spacer so this item's
+        // number lines up in the same column as items that DO have a caret.
+        var spacer = document.createElement("span");
+        spacer.className = "toc-caret toc-caret-empty";
+        link.insertBefore(spacer, link.firstChild);
       }
     });
 

@@ -406,6 +406,29 @@ nav.toc a.active {
 .code-wrap.is-cmd pre { background: #1E2740; border-left: 0; }
 .code-wrap.is-cmd pre code { color: #E6EAF2; }
 .code-wrap.is-cmd .codehilite { background: #1E2740; }
+/* dark-terminal syntax palette for command blocks (light-theme pygments
+   colors are dark-on-dark and become unreadable on the navy background). */
+.code-wrap.is-cmd .codehilite span { color: #E6EAF2; }
+.code-wrap.is-cmd .codehilite .c,
+.code-wrap.is-cmd .codehilite .c1,
+.code-wrap.is-cmd .codehilite .cm { color: #8B98AD; font-style: italic; }
+.code-wrap.is-cmd .codehilite .s,
+.code-wrap.is-cmd .codehilite .s1,
+.code-wrap.is-cmd .codehilite .s2,
+.code-wrap.is-cmd .codehilite .se { color: #A5D6FF; }
+.code-wrap.is-cmd .codehilite .k,
+.code-wrap.is-cmd .codehilite .kd,
+.code-wrap.is-cmd .codehilite .kn,
+.code-wrap.is-cmd .codehilite .o  { color: #FF7B72; }
+.code-wrap.is-cmd .codehilite .nb,
+.code-wrap.is-cmd .codehilite .bp,
+.code-wrap.is-cmd .codehilite .nv,
+.code-wrap.is-cmd .codehilite .mi,
+.code-wrap.is-cmd .codehilite .mf { color: #79C0FF; }
+.code-wrap.is-cmd .codehilite .nf,
+.code-wrap.is-cmd .codehilite .fm { color: #D2A8FF; }
+.code-wrap.is-cmd .codehilite .nc,
+.code-wrap.is-cmd .codehilite .nn { color: #FFA657; }
 
 /* --- callout boxes --- */
 .callout {
@@ -4288,11 +4311,37 @@ default_hooks.checkpoint.interval<span class="o">=</span><span class="m">10</spa
       }
     });
 
-    // 3) Scroll-spy: highlight TOC entry in view + auto-expand its group.
+    // 3) Scroll-spy: highlight TOC entry in view + accordion-expand its group.
     var tocLinks = {};
     document.querySelectorAll("nav.toc a[href^='#']").forEach(function (a) {
       tocLinks[decodeURIComponent(a.getAttribute("href").slice(1))] = a;
     });
+
+    // Accordion expand: open only the ancestor chain of link `a`, collapse the rest.
+    function expandFor(a) {
+      var chain = [];
+      var p = a ? a.closest("li") : null;
+      while (p) { chain.push(p); p = p.parentElement.closest("li"); }
+      tocRoot.querySelectorAll("li.has-children").forEach(function (li) {
+        if (chain.indexOf(li) === -1) li.classList.add("collapsed");
+        else li.classList.remove("collapsed");
+      });
+    }
+
+    // While the page is smooth-scrolling to a clicked target, the observer would
+    // otherwise fire for every section it passes and expand them all. Suppress
+    // auto-expand during that window so only the clicked target stays open.
+    var suppressExpand = false;
+    var suppressTimer = null;
+    document.querySelectorAll("nav.toc a[href^='#']").forEach(function (a) {
+      a.addEventListener("click", function () {
+        suppressExpand = true;
+        expandFor(a);
+        clearTimeout(suppressTimer);
+        suppressTimer = setTimeout(function () { suppressExpand = false; }, 900);
+      });
+    });
+
     var heads = document.querySelectorAll("main.content h2[id], main.content h3[id]");
     if (heads.length && "IntersectionObserver" in window) {
       var current = null;
@@ -4304,9 +4353,7 @@ default_hooks.checkpoint.interval<span class="o">=</span><span class="m">10</spa
               if (current) current.classList.remove("active");
               a.classList.add("active");
               current = a;
-              // expand ancestor groups so the active item is visible
-              var p = a.closest("li");
-              while (p) { p.classList.remove("collapsed"); p = p.parentElement.closest("li"); }
+              if (!suppressExpand) expandFor(a);
             }
           }
         });
